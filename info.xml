@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <name>Cron Heartbeat</name>
+  <author>Envesko</author>
+  <website>https://github.com/envesko/userspice-cron-heartbeat</website>
+  <version>1.0.0</version>
+  <release>June 21, 2026</release>
+  <tested>6.1.0</tested>
+  <fa_icon>fa fa-heartbeat</fa_icon>
+  <description>Track whether your scheduled cron jobs actually run. Drop one cronGuard() call at the top of any cron file to enforce an IP allowlist and record a heartbeat. The dashboard widget and config page show every job's last run, run count, and flags any job that has gone stale. Complements the built-in Cron Manager, which schedules jobs but does not verify they ran.</description>
+  <button>Cron Heartbeat</button>
+</plugin>

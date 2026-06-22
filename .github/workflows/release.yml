@@ -1,0 +1,36 @@
+name: Build Spice Shaker release
+on:
+  release:
+    types: [published]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: Resolve plugin slug and build wrapped zip
+        id: build
+        run: |
+          SLUG=$(php -r 'include "plugin_info.php"; echo $plugin_name;')
+          mkdir -p "build/$SLUG"
+          rsync -a --exclude='.git' --exclude='.github' --exclude='*.zip' --exclude='build' ./ "build/$SLUG/"
+          (cd build && zip -rq "../$SLUG.zip" "$SLUG")
+          # Identical algorithm to users/parsers/downloader.php
+          HASH=$(php -r 'echo base64_encode(hash_file("sha256", $argv[1]));' "$SLUG.zip")
+          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+      - name: Attach zip to the release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.build.outputs.slug }}.zip
+      - name: Print URL and hash for the store
+        run: |
+          {
+            echo "### Spice Shaker submission values"
+            echo "- Download URL: \`${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/${{ steps.build.outputs.slug }}.zip\`"
+            echo "- Hash: \`${{ steps.build.outputs.hash }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
